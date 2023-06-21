@@ -1,0 +1,662 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{hyperref}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+ }
+ \usepackage{graphicx}
+ \usepackage{titling}
+
+\title{\textbf{Assignment 3 Part 2:} Probabilistic Reasoning}
+\author{Ehsan, Goldstein, Napuri}
+\date{May 2023}
+ 
+ \usepackage{fancyhdr}
+\fancypagestyle{plain}{%  the preset of fancyhdr 
+    \fancyhf{} % clear all header and footer fields
+    \fancyfoot[C]{\thepage}
+    \fancyhead[L]{CS440 Intro to AI}
+    \fancyhead[R]{\theauthor}
+}
+\makeatletter
+\def\@maketitle{%
+  \newpage
+  \null
+  \vskip 1em%
+  \begin{center}%
+  \let \footnote \thanks
+    {\LARGE \@title \par}%
+    \vskip 1em%
+    %{\large \@date}%
+  \end{center}%
+  \par
+  \vskip 1em}
+\makeatother
+
+\usepackage{lipsum}  
+\usepackage{cmbright}
+
+\begin{document}
+
+\maketitle
+
+\noindent\begin{tabular}{@{}ll}
+    \textbf{Submitted By: }Brandon Goldstein (bbg17), Taqiya Ehsan (te137), Swapnil Napuri (spn41)\\
+     \textbf{Date:} 02 May 2023
+\end{tabular}
+
+\subsection*{Problem 1}
+
+From the given problem description, we can define the transition and observation/sensor matrices right off the bat. \\
+
+\noindent 
+Transition matrix, \texttt{T} = 
+$\left(\begin{array}{cccccc} 
+        0.2 & 0.8 & 0 & 0 & 0 & 0 \\ 
+        0 & 0.2 & 0.8 & 0 & 0 & 0 \\ 
+        0 & 0 & 0.2 & 0.8 & 0 & 0 \\ 
+        0 & 0 & 0 & 0.2 & 0.8 & 0 \\ 
+        0 & 0 & 0 & 0 & 0.2 & 0.8 \\ 
+        0 & 0 & 0 & 0 & 0 & 1
+    \end{array}\right)$\\
+
+Observation matrix, \texttt{O} = 
+$\left(\begin{array}{cc} 
+        1 & 0 \\
+        0 & 1 \\ 
+        0 & 1 \\
+        1 & 0 \\
+        0 & 1 \\
+        0 & 1
+    \end{array}\right)$\\
+
+\noindent 
+Let, \textit{hot} = H and \textit{cold} = C\\
+Given, sequence of observations for first 3 days: {$H_{1}$, $C_{2}$, $C_{3}$}
+    
+\subsubsection*{Part 1} 
+
+P($X_{3}$ $\vert$ $H_{1}$, $C_{2}$, $C_{3}$) \\ 
+\indent 
+= $\alpha$ * P($C_{3}$ $\vert$ $X_{3}$) $\sum_{X_2}P(X_{3} \vert X_{2}) P(X_2 \vert H_{1}, C_{2})$\\ 
+\indent 
+= $\alpha$ * P($C_{3}$ $\vert$ $X_{3}$) $\sum_{X_2}P(X_{3} \vert X_{2}) P(C_{2} \vert X_2)\sum_{X_1}P(X_{2} \vert X_{1})P(X_1 \vert H_1)$ \\ 
+
+\noindent 
+We solve this equation in parts. We start from the rightmost part and use the transition matrix for this. Notice that $P(X_1 \vert H_1 = A)$ = P($X_1$ = A) = 1 as we already know that the state on day 1 is A, and all other states will be 0. So we only need to sum over A.\\
+
+\noindent
+$\sum_{X_1}P(X_{2} \vert X_{1})P(X_1 \vert H_1)$ =
+$\left(\begin{array}{c} 
+    0.2 \\ 
+    0.8 \\ 
+    0 \\ 
+    0 \\ 
+    0 \\
+    0
+    \end{array}\right)$ * 1 + 0 = 
+$\left(\begin{array}{c} 
+        0.2 \\
+        0.8 \\ 
+        0 \\
+        0 \\
+        0 \\
+        0
+    \end{array}\right)$
+
+\noindent
+\textit{[The normalizing factor $\alpha$ in this case ends up being 1, so we ignore it here]}\\ 
+
+\noindent 
+$P(X_2 \vert H_{1}, C_{2})$ = $P(C_{2} \vert X_2)\sum_{X_1}P(X_{2} \vert X_{1})P(X_1 \vert H_1)$\\ 
+
+\indent 
+= $\alpha$ * 
+$\left(\begin{array}{c} 
+        0  \\
+        1 \\ 
+        1 \\
+        0 \\
+        1 \\
+        1
+    \end{array}\right)$ * 
+$\left(\begin{array}{c} 
+        0.2 \\
+        0.8 \\ 
+        0 \\
+        0 \\
+        0 \\
+        0
+    \end{array}\right)$ 
+= $\left(\begin{array}{c} 
+        0 \\
+        0.8 \\ 
+        0 \\
+        0 \\
+        0 \\
+        0
+    \end{array}\right)$ [Normalizing factor $\alpha$ = $\frac{1}{0.8}$ = 1.25] \\ 
+
+\indent 
+= $\left(\begin{array}{c} 
+        0 \\
+        1 \\ 
+        0 \\
+        0 \\
+        0 \\
+        0
+    \end{array}\right)\\$ 
+\noindent
+We can deduce that $X_2$ = B from this solution. \\
+
+\noindent
+P($X_{3}$ $\vert$ $H_{1}$, $C_{2}$, $C_{3}$)\\ 
+
+\indent 
+= $\alpha$ * $P(C_3 \vert X_3)$ * $\sum_{X_2}P(X_{3} \vert X_{2}) P(X_2 \vert H_{1}, C_{2})$ \\ 
+
+Here, $P(C_3 \vert X_3)$ = 
+$\left(\begin{array}{c} 
+        0  \\
+        1 \\ 
+        1 \\
+        0 \\
+        1 \\
+        1
+    \end{array}\right)$ \\ 
+
+And $X_2$ is 1 at only B, 0 at rest, so we only need to sum over B. \\ 
+\indent 
+= $\alpha$ * 
+$\left(\begin{array}{c} 
+        0  \\
+        1 \\ 
+        1 \\
+        0 \\
+        1 \\
+        1
+    \end{array}\right)$ * (0 + 
+    $\left(\begin{array}{c} 
+        0 \\
+        0.2 \\ 
+        0.8 \\
+        0 \\
+        0 \\
+        0
+    \end{array}\right)$ + 0) \\ 
+
+\indent 
+= $\alpha$ * 
+$\left(\begin{array}{c} 
+        0 \\
+        1 \\ 
+        1 \\
+        0 \\
+        1 \\
+        1
+    \end{array}\right)$ *
+    $\left(\begin{array}{c} 
+        0 \\
+        0.2 \\ 
+        0.8 \\
+        0 \\
+        0 \\
+        0
+    \end{array}\right)$ \\ 
+
+\indent  
+= $\left(\begin{array}{c} 
+        0 \\
+        0.2 \\ 
+        0.8 \\
+        0 \\
+        0 \\
+        0
+    \end{array}\right)$ 
+[Normalizing factor $\alpha$ = $\frac{1}{0.8+0.2}$ = 1]
+
+\subsubsection*{Part 2}
+P($X_2$ $\vert$ $H_1, C_2, C_3$) = $\alpha * P(C_3 \vert X_2) * P(X_2 \vert H_1, C_2)$ \\ 
+
+\noindent
+From part 1, we already know that $P(X_2 \vert H_1, C_2)$ 
+= $\left(\begin{array}{c} 
+        0 \\
+        1 \\ 
+        0 \\
+        0 \\
+        0 \\
+        0
+    \end{array}\right)$ \\ 
+
+\noindent
+Which implies that $X_2$ = B \\ 
+
+\noindent
+$P(C_3 \vert X_2)$ \\
+
+\indent 
+= $\sum_{X_3} P(X_3 \vert X_2) P(C_3 \vert X_3) P(E_4, C_3 \vert X_3)$  \textit{[$P(E_4, C_3 \vert X_3)$ = 1 as it is a definite sequence of events]} \\ 
+
+\indent 
+= $\sum_{X_3} P(X_3 \vert X_2) * P(C_3 \vert X_3) * \textbf{1}$ \textit{[this can be directly solved from the transition and observation matrices]} \\ 
+
+\indent 
+= $\left(\begin{array}{cccccc} 
+        0.2 & 0.8 & 0 & 0 & 0 & 0 \\ 
+        0 & 0.2 & 0.8 & 0 & 0 & 0 \\ 
+        0 & 0 & 0.2 & 0.8 & 0 & 0 \\ 
+        0 & 0 & 0 & 0.2 & 0.8 & 0 \\ 
+        0 & 0 & 0 & 0 & 0.2 & 0.8 \\ 
+        0 & 0 & 0 & 0 & 0 & 1
+    \end{array}\right)^T$ * 
+$\left(\begin{array}{c} 
+        0 \\
+        1 \\ 
+        1 \\
+        0 \\
+        1 \\
+        1
+    \end{array}\right)$ 
+= $\left(\begin{array}{c} 
+        0.8 \\
+        1 \\ 
+        0.2 \\
+        0.8 \\
+        1 \\
+        1
+    \end{array}\right)$ \\ 
+\\ 
+
+\noindent 
+P($X_2$ $\vert$ $H_1, C_2, C_3$) \\
+
+\indent 
+= $\alpha * P(C_3 \vert X_2) * P(X_2 \vert H_1, C_2)$ \\ 
+
+\indent 
+= $\alpha * 
+\left(\begin{array}{c} 
+        0.8 \\
+        1 \\ 
+        0.2 \\
+        0.8 \\
+        1 \\
+        1
+    \end{array}\right) * 
+\left(\begin{array}{c} 
+        0 \\
+        1 \\ 
+        0 \\
+        0 \\
+        0 \\
+        0
+    \end{array}\right) =
+    \left(\begin{array}{c} 
+        0 \\
+        1 \\ 
+        0 \\
+        0 \\
+        0 \\
+        0
+    \end{array}\right)$ 
+\textit{[The normalizing factor $\alpha$ in this case ends up being 1]}
+
+\subsubsection*{Part 3}
+P($H_4$ $\vert$ $H_1, C_2, C_3$) = $\sum_{X_3} P(X_3 \vert H_1, C_2, C_3) P(H_4 \vert X_3)$\\ 
+
+\noindent
+From part 1, we already know that P($X_{3}$ $\vert$ $H_{1}$, $C_{2}$, $C_{3}$)
+= $\left(\begin{array}{c} 
+        0 \\
+        0.2 \\ 
+        0.8 \\
+        0 \\
+        0 \\
+        0
+    \end{array}\right)$ 
+
+\noindent
+P($H_4 \vert X_3$) = $\sum_{X_4} P(X_4 \vert X_3)P(H_4 \vert X_4)$ \\
+
+\indent 
+= $\left(\begin{array}{cccccc} 
+        0.2 & 0.8 & 0 & 0 & 0 & 0 \\ 
+        0 & 0.2 & 0.8 & 0 & 0 & 0 \\ 
+        0 & 0 & 0.2 & 0.8 & 0 & 0 \\ 
+        0 & 0 & 0 & 0.2 & 0.8 & 0 \\ 
+        0 & 0 & 0 & 0 & 0.2 & 0.8 \\ 
+        0 & 0 & 0 & 0 & 0 & 1
+    \end{array}\right)$ X 
+$\left(\begin{array}{c} 
+        1 \\
+        0 \\ 
+        0 \\
+        1 \\
+        0 \\
+        0
+    \end{array}\right)$ 
+= $\left(\begin{array}{c} 
+        0.2 \\
+        0 \\ 
+        0.8 \\
+        0.2 \\
+        0 \\
+        0
+    \end{array}\right)$ \\ 
+\\ 
+
+P($H_4$ $\vert$ $H_1, C_2, C_3$) = $\sum_{X_3} P(X_3 \vert H_1, C_2, C_3) P(H_4 \vert X_3)$\\ 
+
+\indent
+= $\left(\begin{array}{c} 
+        0 \\
+        0.2 \\ 
+        0.8 \\
+        0 \\
+        0 \\
+        0
+    \end{array}\right)^T$ X
+$\left(\begin{array}{c} 
+        0.2 \\
+        0 \\ 
+        0.8 \\
+        0.2 \\
+        0 \\
+        0
+    \end{array}\right)$ 
+= \textbf{0.64}\\ 
+
+\subsubsection*{Part 4}
+P($X_4$ $\vert$ $H_1, C_2, C_3$) = $\sum_{X_3} P(X_3 \vert H_1, C_2, C_3)P(X_4 \vert X_3)$\\
+Both values have been calculated above \\
+\\
+\indent 
+= $\left(\begin{array}{cccccc} 
+        0.2 & 0.8 & 0 & 0 & 0 & 0 \\ 
+        0 & 0.2 & 0.8 & 0 & 0 & 0 \\ 
+        0 & 0 & 0.2 & 0.8 & 0 & 0 \\ 
+        0 & 0 & 0 & 0.2 & 0.8 & 0 \\ 
+        0 & 0 & 0 & 0 & 0.2 & 0.8 \\ 
+        0 & 0 & 0 & 0 & 0 & 1
+    \end{array}\right)^T$ X 
+$\left(\begin{array}{c} 
+        0 \\
+        0.2 \\ 
+        0.8 \\
+        0 \\
+        0 \\
+        0
+    \end{array}\right)$ 
+= $\left(\begin{array}{c} 
+        0 \\
+        0.04 \\ 
+        0.32 \\
+        0.64 \\
+        0 \\
+        0
+    \end{array}\right)$ \\ 
+
+    
+\subsubsection*{Part 5 (Bonus Question)}
+$P(H_4, H_5, C_6 \vert H_1, C_2, C_3) = \sum_{X_3}P(X_3 \vert H_1, C_2, C_3) P(H_4, H_5, C_6 \vert X_3)$ \\
+
+\noindent
+The first expression on the right is basically the filtering problem we solved in part 1. \\ 
+\noindent 
+$P(X_3 \vert H_1, C_2, C_3)$ = 
+$\left(\begin{array}{c} 
+        0 \\
+        0.2 \\ 
+        0.8 \\
+        0 \\
+        0 \\
+        0
+    \end{array}\right)$ \\ 
+
+\noindent
+The second expression can be solved sequentially following the \texttt{backward} model. \\ 
+
+\noindent
+$P(H_4, H_5, C_6 \vert X_3) = \sum_{X_4} P(X_4 \vert X_3) P(H_4 \vert X_4) P(H_5, C_6 \vert X_4)$ \\ 
+
+\noindent
+$P(H_5, C_6 \vert X_4) = \sum_{X_5} P(X_5 \vert X_4) P(H_5 \vert X_5) P(C_6 \vert X_5)$ \\ 
+
+\noindent
+$P(C_6 \vert X_5) = \sum_{X_6} P(X_6 \vert X_5) P(C_6 \vert X_6)$ \\ 
+
+\noindent
+We can start solving from the last equation using the transition and observation matrices. \\ 
+
+\noindent 
+$P(C_6 \vert X_5)$ \\ 
+
+\indent 
+= $\sum_{X_6} P(X_6 \vert X_5) P(C_6 \vert X_6)$ \\ 
+
+\indent 
+= $\left(\begin{array}{c} 
+        \sum_{X_6} P(X_6 \vert X_5 = A) * P(C_6 \vert X_6)\\
+        \sum_{X_6} P(X_6 \vert X_5 = B) * P(C_6 \vert X_6) \\ 
+        \sum_{X_6} P(X_6 \vert X_5 = C) * P(C_6 \vert X_6) \\
+        \sum_{X_6} P(X_6 \vert X_5 = D) * P(C_6 \vert X_6) \\
+        \sum_{X_6} P(X_6 \vert X_5 = E) * P(C_6 \vert X_6) \\
+        \sum_{X_6} P(X_6 \vert X_5 = F) * P(C_6 \vert X_6)
+    \end{array}\right)$ \\ 
+\indent 
+= $\left(\begin{array}{c} 
+        0 + 0.8 + 0 + 0 + 0 + 0 \\
+        0 + 0.2 + 0.8 + 0 + 0 + 0 \\ 
+        0 + 0 + 0.2 + 0 + 0 + 0\\
+        0 + 0 + 0 + 0 + 0.8 + 0\\
+        0 + 0 + 0 + 0 + 0.2 + 0.8 \\
+        0 + 0 + 0 + 0 + 0 + 1
+    \end{array}\right)$ \\
+\indent 
+= $\left(\begin{array}{c} 
+        0.8 \\
+        1 \\ 
+        0.2 \\
+        0.8 \\
+        1 \\
+        1
+    \end{array}\right)$ \\ 
+\\ 
+
+\noindent 
+$P(H_5, C_6 \vert X_4)$ \\ 
+
+\indent 
+= $\sum_{X_5} P(X_5 \vert X_4) P(H_5 \vert X_5) P(C_6 \vert X_5)$ \\ 
+
+\indent
+= $\left(\begin{array}{c} 
+        \sum_{X_5} P(X_5 \vert X_4 = A) * P(H_5 \vert X_5) * P(C_6 \vert X_5)\\
+        \sum_{X_5} P(X_5 \vert X_4 = B) * P(H_5 \vert X_5) * P(C_6 \vert X_5) \\ 
+        \sum_{X_5} P(X_5 \vert X_4 = C) * P(H_5 \vert X_5) * P(C_6 \vert X_5) \\
+        \sum_{X_5} P(X_5 \vert X_4 = D) * P(H_5 \vert X_5) * P(C_6 \vert X_5) \\
+        \sum_{X_5} P(X_5 \vert X_4 = E) * P(H_5 \vert X_5) * P(C_6 \vert X_5) \\
+        \sum_{X_5} P(X_5 \vert X_4 = F) * P(H_5 \vert X_5) * P(C_6 \vert X_5)
+    \end{array}\right)$ 
+= $\left(\begin{array}{c} 
+        0.8*0.2*1\\
+        0 \\ 
+        0.8*0.8*1 \\
+        0.8*0.2*1\\
+        0 \\
+        0
+    \end{array}\right)$ = 
+$\left(\begin{array}{c} 
+        0.16\\
+        0 \\ 
+        0.64\\
+        0.16\\
+        0 \\
+        0
+    \end{array}\right)$ \\ 
+\\ 
+
+\noindent 
+$P(H_4, H_5, C_6 \vert X_3)$ \\ 
+
+\indent 
+= $\sum_{X_4} P(X_4 \vert X_3) P(H_4 \vert X_4) P(H_5, C_6 \vert X_4)$ \\ 
+
+\indent
+= $\left(\begin{array}{c} 
+        \sum_{X_4} P(X_4 \vert X_3 = A) * P(H_4 \vert X_4) * P(H_5, C_6 \vert X_4)\\
+        \sum_{X_4} P(X_4 \vert X_3 = B) * P(H_4 \vert X_4) * P(H_5, C_6 \vert X_4) \\ 
+        \sum_{X_4} P(X_4 \vert X_3 = C) * P(H_4 \vert X_4) * P(H_5, C_6 \vert X_4) \\
+        \sum_{X_4} P(X_4 \vert X_3 = D) * P(H_4 \vert X_4) * P(H_5, C_6 \vert X_4) \\
+        \sum_{X_4} P(X_4 \vert X_3 = E) * P(H_4 \vert X_4) * P(H_5, C_6 \vert X_4) \\
+        \sum_{X_4} P(X_4 \vert X_3 = F) * P(H_4 \vert X_4) * P(H_5, C_6 \vert X_4)
+    \end{array}\right)$ 
+= $\left(\begin{array}{c} 
+        0.16*0.2*1\\
+        0 \\ 
+        0.8*0.16*1 \\
+        0.16*0.2*1\\
+        0 \\
+        0
+    \end{array}\right)$ = 
+$\left(\begin{array}{c} 
+        0.032\\
+        0 \\ 
+        0.128\\
+        0.032\\
+        0 \\
+        0
+    \end{array}\right)$ 
+\\ 
+\\ 
+
+\noindent 
+$P(H_4, H_5, C_6 \vert X_3)$ = 
+$\left(\begin{array}{c} 
+        0 \\
+        0.2 \\ 
+        0.8 \\
+        0 \\
+        0 \\
+        0
+    \end{array}\right)$ * 
+$\left(\begin{array}{c} 
+        0.032\\
+        0 \\ 
+        0.128\\
+        0.032\\
+        0 \\
+        0
+    \end{array}\right)$ 
+= 0.8 * 0.128 = \textbf{0.1024} 
+    
+
+
+
+\subsection*{Problem 2}
+
+\subsubsection*{Part 1} 
+
+The Bellman Equation, as defined in class, is: $V^{\pi}(s) = R(s, \pi (s)) + \gamma \sum_{s' \in States} T(s, \pi (s), s')V^{\pi}(s')$.
+
+\subsubsection*{Part 2} 
+
+$\forall s \in States: V^{\pi}_{k+1}(s) = R(s, \pi (s)) + \gamma \sum_{s' \in States} T(s, \pi (s), s')V^{\pi}_k(s')$\\
+
+\begin{table}[!h]
+    \centering
+    \small
+    \begin{tabular}{cccc}
+        \hline
+         State & $V^{\pi}_0$\\
+         \hline
+         A & 0\\
+         B & 0\\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+
+$V^{\pi}_1(A) = R(A, \pi (A)) + \gamma (T(A, \pi (A), A)V^{\pi}_0(A) + T(A, \pi (A), B)V^{\pi}_0(B))$\\
+
+$V^{\pi}_1(A) = R(A, 1) + \gamma (T(A, 1, A)V^{\pi}_0(A) + T(A, 1, B)V^{\pi}_0(B))$\\
+
+$V^{\pi}_1(A) = 0 + (1)((1)(0) + (0)(0)) = 0$\\
+
+$V^{\pi}_1(B) = R(B, \pi (B)) + \gamma (T(B, \pi (B), A)V^{\pi}_0(A) + T(B, \pi (B), B)V^{\pi}_0(B))$\\
+
+$V^{\pi}_1(B) = R(B, 1) + \gamma (T(B, 1, A)V^{\pi}_0(A) + T(B, 1, B)V^{\pi}_0(B))$\\
+
+$V^{\pi}_1(B) = 5 + (1)((0)(0) + (1)(0)) = 5$\\
+
+\begin{table}[!h]
+    \centering
+    \small
+    \begin{tabular}{cccc}
+        \hline
+         State & $V^{\pi}_0$ & $V^{\pi}_1$\\
+         \hline
+         A & 0 & 0\\
+         B & 0 & 5\\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+
+$V^{\pi}_2(A) = R(A, \pi (A)) + \gamma (T(A, \pi (A), A)V^{\pi}_1(A) + T(A, \pi (A), B)V^{\pi}_1(B))$\\
+
+$V^{\pi}_2(A) = R(A, 1) + \gamma (T(A, 1, A)V^{\pi}_1(A) + T(A, 1, B)V^{\pi}_1(B))$\\
+
+$V^{\pi}_2(A) = 0 + (1)((1)(0) + (0)(5)) = 0$\\
+
+$V^{\pi}_2(B) = R(B, \pi (B)) + \gamma (T(B, \pi (B), A)V^{\pi}_1(A) + T(B, \pi (B), B)V^{\pi}_1(B))$\\
+
+$V^{\pi}_2(B) = R(B, 1) + \gamma (T(B, 1, A)V^{\pi}_1(A) + T(B, 1, B)V^{\pi}_1(B))$\\
+
+$V^{\pi}_2(B) = 5 + (1)((0)(0) + (1)(5)) = 10$\\
+
+\begin{table}[!h]
+    \centering
+    \small
+    \begin{tabular}{cccc}
+        \hline
+         State & $V^{\pi}_0$ & $V^{\pi}_1$ & $V^{\pi}_2$\\
+         \hline
+         A & 0 & 0 & 0\\
+         B & 0 & 5 & 10\\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+
+\subsubsection*{Part 3}
+
+$\forall s \in States: \pi_{new}(s) = \arg\max_{a \in A}[R(s,a) + \gamma \sum_{s' \in States} T(s, a, s')V^{\pi}_2(s')]$\\
+
+\noindent 
+$R(A, 1) + \gamma (T(A, 1, A)V^{\pi}_2(A) + T(A, 1, B)V^{\pi}_2(B)) = 0 + (1)((1)(0) + (0)(10)) = 0$\\
+
+\noindent 
+$R(A, 2) + \gamma (T(A, 2, A)V^{\pi}_2(A) + T(A, 2, B)V^{\pi}_2(B)) = (-1) + (1)((0.5)(0) + (0.5)(10)) = 4$\\
+
+\noindent 
+$4 > 0 \Longrightarrow \pi_{new}(A) = 2$\\
+
+\noindent 
+$R(B, 1) + \gamma (T(B, 1, A)V^{\pi}_2(A) + T(B, 1, B)V^{\pi}_2(B)) = 5 + (1)((0)(0) + (1)(10)) = 15$\\
+
+\noindent 
+$R(B, 2) + \gamma (T(B, 2, A)V^{\pi}_2(A) + T(B, 2, B)V^{\pi}_2(B)) = 0 + (1)((0)(0) + (1)(10)) = 10$\\
+
+\noindent 
+$15 > 10 \Longrightarrow \pi_{new}(B) = 1$\\
+
+\noindent
+$\pi_{new} = (\pi_{new}(A), \pi_{new}(B)) = (2, 1)$
+
+\end{document}
